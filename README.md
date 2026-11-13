@@ -1,77 +1,84 @@
-# AIMI · Android 전환용 소스
+# AIMI
 
-토스에 배포한 **AIMI**를 독립 Android 앱으로 전환하기 위한 동료 인계 저장소입니다.
-기존 화면·게임·추천·서버 로직을 재사용하고, Capacitor와 Android 인증을 추가하는 것이 목표입니다.
+**매일 쌓이는 나의 AI 감각**
 
-**현재는 소스 인계 단계입니다. APK/AAB 또는 Capacitor Android 프로젝트가 구현된 상태는 아닙니다.**
+이미지 속 키워드를 찾으며 프롬프트를 학습하고, 질문을 다듬고, 작업에 맞는 AI 모델을 비교하는 서비스입니다. 미니게임으로 챌린지 예산을 모으고, 활동으로 획득한 EP로 정원과 캐릭터를 꾸밀 수 있습니다.
 
-- 원본: [fotrhh22/aimi-online](https://github.com/fotrhh22/aimi-online)
-- 기준일: 2026-11-13. 원본의 최신 로컬 수정까지 포함한 선별 스냅샷입니다.
-- 이 저장소를 수정해도 토스 운영 앱과 자동 동기화되지 않습니다.
+앱인토스에 배포된 [AIMI](https://github.com/fotrhh22/aimi-online)를 기반으로 하는 **Android 전환 프로젝트**입니다.
 
-## 포함된 기능
+## 주요 기능
 
-- 홈·출석·오늘의 팁·EP, 3종 미니게임
-- 10일 이미지 챌린지·키워드 판정·일별 해설
-- 정원·아이템·캐릭터 상점, 친구 요청·수락·방문
-- Gemini 프롬프트 개선과 텍스트·이미지·영상 모델 추천
-- Fastify API, 공유 Zod 계약, 게임 시뮬레이션·추천 엔진, Supabase migration
-- 실제 UI 에셋·폰트·챌린지 이미지와 콘텐츠 데이터
+| 기능 | 내용 |
+| --- | --- |
+| 이미지 챌린지 | 사전 생성된 이미지의 키워드 선택·규칙 기반 판정·정답 프롬프트·일별 해설 |
+| 프롬프트 개선 | 기존 의도를 보존한 개선안·확장안·구절별 작성 팁 |
+| AI 모델 추천 | 텍스트·이미지·영상별 모델 목록, 업무 분석과 코드 기반 비용 비교 |
+| 미니게임 | 폴짝 길건너기·점프 달리기·숲길 달리기 |
+| 정원·상점 | 아이템 구매·자유 배치·캐릭터 선택 |
+| 소셜 | 친구 코드·친구 요청 및 수락·삭제·정원 방문 |
+| 일일 활동 | 출석·오늘의 팁·EP·진행 기록 |
+| 계정 | 닉네임·세션·개인정보처리방침·계정 삭제 |
 
-## 로컬에서 확인하기
+## 사용 서비스
 
-Node.js 22.12 이상과 npm을 사용합니다. 저장소 루트에서 실행하세요.
+기반 서비스의 운영 구성과 소스에 포함된 연동입니다. 이 저장소 자체의 Android 운영 배포를 뜻하지 않습니다.
+
+| 서비스 | 용도 |
+| --- | --- |
+| 앱인토스 | 기존 미니앱 배포·실행 환경, 익명 사용자 인증·공유·내비게이션 |
+| Render | Fastify 백엔드 API 호스팅 |
+| Supabase | PostgreSQL 데이터 저장 및 Storage 콘텐츠 저장 |
+| Google Gemini API | 프롬프트 개선·업무 분석·모델군 제안 |
+| OpenRouter API | 모델 목록·가격·지원 기능 수집, 챌린지 이미지 제작에 사용 |
+| Artificial Analysis API | 모델 성능·출력 속도·응답 지연 자료 |
+| GitHub | 소스·변경 이력 관리 |
+
+모델 추천은 Gemini의 업무 분석과 서버의 필터·비용 계산을 조합합니다. 이미지 챌린지 판정은 LLM 채점이 아닌 서버 규칙으로 처리합니다. 챌린지 이미지는 미리 제작된 콘텐츠를 조회합니다.
+
+## 기술 스택
+
+| 영역 | 기술 |
+| --- | --- |
+| 프런트엔드 | React 18 · TypeScript · Vite · CSS · Emotion |
+| 기존 토스 연동 | Apps-in-Toss Web Framework · TDS |
+| 게임 | Canvas 2D · 공유 TypeScript 시뮬레이션 |
+| 백엔드 | Node.js · Fastify · PostgreSQL |
+| 공유 계약 | Zod · npm workspaces |
+| 검증 | Node.js Test Runner · Playwright |
+
+## 폴더 구성
+
+```text
+apps/
+  miniapp/             React 화면·게임·에셋·기존 토스 연동
+  api/                 인증·거래·콘텐츠·Gemini API
+packages/
+  contracts/           공유 타입·스키마
+  game-core/           게임 규칙·시뮬레이션
+  recommender/         모델 필터·비용 계산
+content/               챌린지·모델 목록·일정·정책
+supabase/migrations/   DB 스키마 변경 이력
+tools/                 개발·콘텐츠·모델 관리·검증 도구
+docs/                  Android 전환 자료·기존 정책 참고
+```
+
+## 실행
+
+Node.js 22.12 이상.
 
 ```sh
 npm ci
 AIMI_AI_MODE=fixture npm run dev
 ```
 
-웹 화면: `http://127.0.0.1:5180` · 로컬 API: `http://127.0.0.1:8081`
+프런트엔드 `http://127.0.0.1:5180` · 로컬 API `http://127.0.0.1:8081`.
 
-개발용 API는 메모리 상태와 예시 AI 응답을 사용합니다. 원격 DB·토스 인증서·실제 Gemini 키 없이 확인할 수 있습니다. 기본적으로 API를 재시작하면 개발 기록이 초기화됩니다. 실제 토스 계정이나 운영 데이터와 연결되지 않습니다.
+로컬 개발 모드는 메모리 저장소와 예시 AI 응답을 사용하며, API 재시작 시 개발 기록이 초기화됩니다. 환경변수 예시는 `apps/api/.env.example`, `apps/miniapp/.env.example`에 있습니다. 실제 키·개인키·사용자 DB 데이터는 포함되지 않습니다.
 
-```sh
-npm run typecheck
-npm run build
-npm test
-```
+## 현재 상태
 
-`build`는 기존 웹/API 빌드이며 APK/AAB를 만들지 않습니다. `npm run build:web-demo`는 종료 안내만 만드는 옛 명령이므로 Android 빌드에 사용하지 마세요.
+2026-11-13 기준 기존 화면·서버·공유 로직·에셋·10일 콘텐츠가 포함되어 있습니다. 웹/API 빌드와 기존 테스트 **118개가 통과**했습니다.
 
-## Android 전환에서 할 일
+**Capacitor·Android 네이티브 프로젝트·APK/AAB는 아직 구현되지 않았습니다.** 토스 의존성 분리와 Android 인증·내비게이션 연결이 남아 있습니다.
 
-1. Capacitor와 Android 프로젝트 추가, 앱 ID·아이콘·서명 설정.
-2. Android 실행 환경 추가. 현재 런타임은 토스/로컬/이전 웹 데모만 구분합니다.
-3. **토스 SDK·TDS 제거 또는 Android 번들에서 완전 분리.** 독립 WebView에서 그대로 실행하면 안 됩니다.
-4. 토스 익명 식별자 대신 Android용 인증 도입. 서버에서 검증한 계정을 기존 내부 사용자 UUID에 연결합니다.
-5. 상단 내비게이션·시스템 뒤로가기·안전 영역·키보드·공유·클립보드·저장소 연결.
-6. 별도 개발 서버/DB에서 실제 AI·EP·소셜 검증 후 서명 AAB 생성 및 Play Console 테스트.
-
-UI와 게임·보상 규칙은 유지합니다. 기존 토스 사용자의 기록은 Android 계정으로 자동 이전되지 않습니다.
-
-## 구조
-
-| 경로 | 역할 |
-| --- | --- |
-| `apps/miniapp/` | React 화면·게임 렌더링·토스 연동 코드·공개 에셋 |
-| `apps/api/` | Fastify API·인증·DB·거래·Gemini |
-| `packages/` | contracts / game-core / recommender |
-| `content/` | 챌린지 정답·모델 목록·일정·정책. 서버용 정답은 공개 앱 에셋에 넣지 않기 |
-| `supabase/migrations/` | 스키마 변경 이력. 운영 DB에 일괄 재실행 금지 |
-| `tools/` | 개발·검증·콘텐츠·모델 관리 도구 |
-| `docs/ANDROID_HANDOFF.md` | 교체할 코드 위치·권장 작업 순서·환경변수 |
-| `docs/SOURCE_SNAPSHOT.json` | 인계한 원본 파일 목록·해시 |
-| `docs/reference/` | 기존 정책 참고. 과거 토스 전용 내용은 Android에서 재검토 |
-
-## 키·서버·개인정보
-
-실제 환경변수·인증서·서명키·사용자 DB 데이터는 포함하지 않았습니다. 설정 예시는 `apps/api/.env.example`, `apps/miniapp/.env.example`을 참고하세요. Gemini 키는 서버에서만 사용합니다.
-
-운영 Render/Supabase를 동료 개발에 바로 연결하지 마세요. 별도 환경에서 준비하고 운영 변경은 소유자와 협의합니다. 종료된 Vercel 데모는 다시 열지 않습니다.
-
-Play 제출 전 개인정보처리방침 공개 URL·데이터 보안 설문·계정 삭제 경로와 당시 Google Play 정책을 확인해야 합니다.
-
-## 인계본 검증
-
-2026-11-13 별도 복사본에서 `npm ci`, `npm run build`, `npm test`를 실행했고 기존 테스트 **118개가 통과**했습니다. Android 실기기·Capacitor·AAB 검증은 아직 하지 않았습니다. 모델 검증 테스트에 필요한 공개 원본/공급사 근거 스냅샷도 포함했습니다.
+[Android 전환 기술 문서](docs/ANDROID_HANDOFF.md) · [소스 스냅샷 목록](docs/SOURCE_SNAPSHOT.json)
